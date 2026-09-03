@@ -118,6 +118,7 @@ CPPFLAGS = -I $(INCLUDE_DIR) -I $(BFL_DIR)include -I $(MLX42_DIR)include/MLX42
 LDFLAGS = -L $(BFL_DIR) -L $(MLX42_DIR)build
 LDLIBS = -lBFL -lmlx42 -lglfw -pthread -lm -ldl
 
+CMAKE := $(shell command -v cmake 2>/dev/null || echo cmake)
 EMCC = emcc
 WEB_DIR = web/
 WASM_BUILD_DIR = $(MLX42_DIR)build_wasm/
@@ -183,14 +184,14 @@ $(NAME): $(LIBBFL) $(LIBMLX42) $(OBJ_DIR) $(OBJ)
 
 $(LIBMLX42): $(MLX42_DIR)
 	@git submodule update --init --recursive
-	@cmake -S include/MLX42 -B include/MLX42/build
-	@cmake --build include/MLX42/build -j
+	@$(CMAKE) -S include/MLX42 -B include/MLX42/build
+	@$(CMAKE) --build include/MLX42/build -j
 
 $(LIBMLX42_WASM):
 	@git submodule update --init --recursive
 	emcmake cmake -S $(MLX42_DIR) -B $(WASM_BUILD_DIR) \
 		-DCMAKE_C_FLAGS="-DEMSCRIPTEN"
-	cmake --build $(WASM_BUILD_DIR) -j
+	$(CMAKE) --build $(WASM_BUILD_DIR) -j
 
 ifdef WITH_DEBUG
 $(LIBBFL):
